@@ -1,0 +1,28 @@
+{
+    "name": "Steam Comment",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "description": "Auto comment to steam profiles",
+    "icons": {},
+    "content_scripts": [
+        {
+            "run_at": "document_end",
+            "matches": [
+                "*://steamcommunity.com/id/*/friends/*"
+            ],
+            "js": [
+                "./js/content.js"
+            ]
+        }
+    ],
+    "background": {
+        "scripts": [
+            "/js/background.js"
+        ],
+        "persistent": false
+    },
+    "permissions": [
+        "*://steamcommunity.com/id/*/friends/*",
+        "tabs"
+    ]
+}
