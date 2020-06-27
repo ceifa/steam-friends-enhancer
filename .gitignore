@@ -1,6 +1,6 @@
 # Build
-build
-build-dev
+build/
+build-dev/
 
 # Logs
 logs
