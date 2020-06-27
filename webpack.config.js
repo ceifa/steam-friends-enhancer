@@ -25,7 +25,8 @@ module.exports = {
     mode: env,
     entry: {
         content: './src/content/content.ts',
-        background: './src/background/background.ts'
+        background: './src/background/background.ts',
+        injected: './src/injected/injected.ts'
     },
     devtool: env === 'development' && 'source-map',
     module: {
@@ -44,13 +45,11 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyPlugin(
-            [
+        new CopyPlugin({
+            patterns: [
                 { from: './manifest.json', to: '../' }
-            ],
-            {
-                copyUnmodified: true
-            }),
+            ]
+        }),
         ...plugins
     ]
 };

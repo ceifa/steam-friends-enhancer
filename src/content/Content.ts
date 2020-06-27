@@ -1,86 +1,46 @@
+import { sendComments } from './CommentSender';
 import $ from 'jquery';
-import { executeOnPageRealm } from './Proxy';
 
-declare global {
-    interface Window {
-        g_sessionID: string;
-    }
-}
+const manageButtonsContainer = document.querySelector('#manage_friends div:nth-child(2)') as HTMLElement;
+const sendCommentButton = document.createElement("span");
+sendCommentButton.className = "manage_action btnv6_lightblue_blue btn_medium";
+sendCommentButton.innerHTML = "<span>Send comment</span>";
+manageButtonsContainer.appendChild(sendCommentButton);
 
-if (!document.getElementById("send-comment")) {
-    const manageButtons = document.getElementById("manage_friends").childNodes[3];
-    const newBtn = document.createElement("span");
-    newBtn.className = "manage_action btnv6_lightblue_blue btn_medium";
-    newBtn.innerHTML = "<span>Send comment</span>";
-    newBtn.id = "send-comment";
-    manageButtons.appendChild(newBtn);
-
-    const manageButtons2 = document.getElementById("manage_friends").childNodes[5];
-    const textarea = document.createElement("div");
-    textarea.innerHTML = `
+const postManageButtonsContainer = document.querySelector('#manage_friends div:nth-child(3)') as HTMLElement;
+postManageButtonsContainer.setAttribute('style', 'display: none; padding-right: 16px; padding-bottom: 16px;');
+postManageButtonsContainer.innerHTML = `
     <div class="commentthread_entry_quotebox">
-        <textarea class="commentthread_textarea" id="comment" placeholder="Comment" style="overflow: hidden; height: 50px;"></textarea>
+        <textarea
+            id="post-comment-text" class="commentthread_textarea" placeholder="Add a comment"
+            style="overflow: hidden; height: 50px;"
+        ></textarea>
     </div>
-    `;
-    manageButtons2.appendChild(textarea);
+    <div class="commentthread_entry_submitlink">
+        <span class="btn_green_white_innerfade btn_small">
+            <span id="post-comment-btn">Post Comment</span>
+        </span>
+    </div>
+`;
 
-    newBtn.onclick = async () => {
-        const steamids: string[] = [];
-        $("#search_results>.selectable.selected:visible").each(function (i: number, ele: HTMLElement) {
-            steamids.push($(ele).data('steamid'));
+sendCommentButton.addEventListener('click', () => {
+    postManageButtonsContainer.style.display = postManageButtonsContainer.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('post-comment-btn').addEventListener('click', async () => {
+    const steamids: string[] = [];
+    // TODO: Stop using jQuery
+    $("#search_results>.selectable.selected:visible").each((i: number, ele: HTMLElement) => {
+        steamids.push($(ele).data('steamid'));
+    });
+
+    const commentElement = document.getElementById("post-comment-text") as HTMLInputElement;
+    const comment = commentElement.value;
+
+    if (comment && steamids.length > 0) {
+        await sendComments({
+            steamids,
+            comment
         });
-
-        const comment = (document.getElementById("comment") as HTMLInputElement).value;
-        
-        const sessionScript = Array.from(document.getElementsByTagName("script"))
-            .find(s => s.innerText.includes("g_sessionID"))
-            .innerText;
-
-        const sessionid = sessionScript.slice(0, sessionScript.indexOf(';')).match(/\".*\"/)[0].replace(/"/g, "");
-
-        if (comment && sessionid) {
-            console.log(`Sending that comment to ${steamids.length} users:\n\n${comment}`)
-
-            let i = 0;
-
-            const send = (sid: string) => new Promise((resolve) => {
-                const commentToSend = comment.replace(/\{name\}/g,
-                    document.querySelector(`[data-steamid='${sid}'] .friend_block_content`).childNodes[0].textContent);
-
-                console.log(`Sending to ${sid}: ${++i}`);
-
-                $.ajax({
-                    url: `https://steamcommunity.com/comment/Profile/post/${sid}/-1/`,
-                    type: 'POST',
-                    data: {
-                        comment: commentToSend,
-                        count: commentToSend.length,
-                        sessionid,
-                        feature2: -1
-                    }
-                }).fail(function (jqxhr) {
-                    console.log("Failed to send to user " + sid);
-                }).done(function (data) {
-                    if (data.success != 1) {
-                        console.log("Failed to send to user " + sid);
-                    }
-                }).always(resolve);
-            });
-
-            for (const sid of steamids) {
-                if (i % 5 === 0) {
-                    await wait(15000);
-                } else if (i % 6) {
-                    await wait(30000);
-                }
-
-                await send(sid);
-                await wait(1000);
-            }
-
-            console.log(`All sent. Success: ${i} ~ Failed ${steamids.length - i} ~ Tax: ${(i / steamids.length) * 100}%`);
-        }
     }
-}
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+});

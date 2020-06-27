@@ -21,8 +21,10 @@
         ],
         "persistent": false
     },
+    "web_accessible_resources": [
+        "/js/injected.js"
+    ],
     "permissions": [
-        "*://steamcommunity.com/id/*/friends/*",
-        "tabs"
+        "*://steamcommunity.com/id/*/friends/*"
     ]
 }
