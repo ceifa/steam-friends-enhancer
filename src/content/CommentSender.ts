@@ -39,6 +39,7 @@ export const sendComments = async ({
 
         logger(`Sending to ${sid}: ${++i}`);
 
+        // TODO: Stop using jQuery
         $.ajax({
             url: `https://steamcommunity.com/comment/Profile/post/${sid}/-1/`,
             type: 'POST',
