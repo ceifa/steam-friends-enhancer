@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jquery": "3.5.1"
   },
   "devDependencies": {
     "@types/chrome": "0.0.117",
