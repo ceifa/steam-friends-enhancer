@@ -8,6 +8,15 @@ declare global {
     interface Window {
         g_sessionID: string;
         ShowBlockingWaitDialog: (title: string, description: string) => CModal;
+        ShowPromptDialog: (
+            title: string,
+            description: string,
+            okBtn: string,
+            cancelBtn: string,
+            _args: any,
+            defaultValue: string
+        ) => CModal;
+        UpdateSelection: () => void;
         FE_currentModal: CModal;
     }
 }
@@ -20,6 +29,23 @@ export const getCurrentSessionId = async () => {
 
     return sessionid;
 };
+
+export const sendPromptAction = (
+    title: string,
+    description: string,
+    okBtn: string,
+    cancelBtn: string,
+    defaultValue: string
+) => {
+    return executeOnPageRealm<string>(() => {
+        try {
+            return window.ShowPromptDialog(
+                '{{title}}', '{{description}}', '{{okBtn}}', '{{cancelBtn}}', undefined, '{{defaultValue}}');
+        } catch {
+            return undefined;
+        }
+    }, { title, description, okBtn, cancelBtn, defaultValue });
+}
 
 export const sendLoadingAction = async (title: string, description: string): Promise<{
     changeDescription: (newDescription: string) => void,

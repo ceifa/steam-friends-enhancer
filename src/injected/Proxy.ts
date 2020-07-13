@@ -42,7 +42,7 @@ export const executeOnPageRealm = <T>(func: Function, args: { [key: string]: str
         resolvers[identifier] = resolve;
 
         const funcToExecute = Object.entries(args).reduce((prev, [key, value]) =>
-            prev.replace(new RegExp(`{{${key}}}`, 'g'), value), func.toString());
+            prev.replace(new RegExp(`{{${key}}}`, 'g'), value == null ? '' : value), func.toString());
 
         window.postMessage({
             identifier: identifier,

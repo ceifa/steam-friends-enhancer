@@ -1,4 +1,4 @@
-window.addEventListener("message", (message: MessageEvent) => {
+window.addEventListener("message", async (message: MessageEvent) => {
     const identifier = message?.data?.identifier;
     if (identifier) {
         // It's the response, should not handle
@@ -12,7 +12,12 @@ window.addEventListener("message", (message: MessageEvent) => {
         };
 
         try {
-            response.result = fn();
+            var result = fn();
+            if (result.then) {
+                response.result = await result;
+            } else {
+                response.result = result;
+            }
         } catch (e) {
             response.error = e.message;
         }
