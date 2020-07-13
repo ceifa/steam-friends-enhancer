@@ -34,14 +34,18 @@ const initializeIfNeeded = () => {
     return Promise.resolve();
 };
 
-export const executeOnPageRealm = <T>(func: Function): Promise<T> => new Promise(async resolve => {
-    await initializeIfNeeded();
+export const executeOnPageRealm = <T>(func: Function, args: { [key: string]: string } = {}): Promise<T> =>
+    new Promise(async resolve => {
+        await initializeIfNeeded();
 
-    const identifier = Math.random().toString(36).substr(2, 9);
-    resolvers[identifier] = resolve;
+        const identifier = Math.random().toString(36).substr(2, 9);
+        resolvers[identifier] = resolve;
 
-    window.postMessage({
-        identifier: identifier,
-        script: func.toString(),
-    }, '*');
-});
+        const funcToExecute = Object.entries(args).reduce((prev, [key, value]) =>
+            prev.replace(new RegExp(`{{${key}}}`, 'g'), value), func.toString());
+
+        window.postMessage({
+            identifier: identifier,
+            script: funcToExecute,
+        }, '*');
+    });

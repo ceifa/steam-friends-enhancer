@@ -1,5 +1,5 @@
-import { wait } from "../../helpers/Util";
-import { getCurrentSessionId } from "../../helpers/Steam";
+import { wait, objectToFormData } from "../../helpers/Util";
+import { getCurrentSessionId, sendLoadingAction } from "../../helpers/Steam";
 import Logger from "../../helpers/Logger";
 import FeatureBase from "../FeatureBase";
 
@@ -66,6 +66,8 @@ export class CommentSender extends FeatureBase {
 
         let total = steamids.length, sent = 0, failed = 0;
 
+        const loading = await sendLoadingAction('Sending comments', 'Loading');
+
         Logger.log(`Sending comment to ${total} friends:`, comment)
 
         for (const sid of steamids) {
@@ -73,7 +75,10 @@ export class CommentSender extends FeatureBase {
                 const friendName = document.querySelector(`[data-steamid='${sid}'] .friend_block_content`).childNodes[0].textContent;
                 const commentToSend = comment.replace(/\{name\}/g, friendName);
 
-                Logger.log(`Sending to ${friendName}(${sid}) - ${++sent}/${total}`);
+                sent++;
+
+                Logger.log(`Sending to ${friendName}(${sid}) - ${sent}/${total}`);
+                await loading.changeDescription(`Total: ${sent}/${total} ~ Success: ${total - failed} ~ Failed: ${failed}`);
 
                 await this.sendComment(sid, commentToSend, sessionid);
             } catch {
@@ -85,18 +90,28 @@ export class CommentSender extends FeatureBase {
         }
 
         Logger.log(`All sent. Success: ${total - failed} ~ Failed: ${failed} ~ Tax: ${(total - failed) / total * 100}%`);
+        await loading.close();
     };
 
     private async sendComment(sid: string, comment: string, sessionid: string) {
-        await fetch(`https://steamcommunity.com/comment/Profile/post/${sid}/-1/`, {
+        var result = await fetch(`https://steamcommunity.com/comment/Profile/post/${sid}/-1/`, {
             method: 'POST',
-            body: JSON.stringify({
+            credentials: 'same-origin',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: objectToFormData({
                 comment,
                 count: comment.length,
                 sessionid,
                 feature2: -1
             })
         })
+
+        var response: { success: boolean } = await result.json();
+        if (response?.success !== true) {
+            throw new Error('Comment request returned unsuccessful');
+        }
     }
 }
 
