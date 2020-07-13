@@ -47,7 +47,8 @@ module.exports = {
         new CleanWebpackPlugin(),
         new CopyPlugin({
             patterns: [
-                { from: './manifest.json', to: '../' }
+                { from: './manifest.json', to: '../' },
+                { from: './static', to: '../static' }
             ]
         }),
         ...plugins

@@ -1,9 +1,11 @@
 {
-    "name": "Steam Comment",
+    "name": "Steam Friends Enhancer",
     "version": "0.0.1",
     "manifest_version": 2,
-    "description": "Auto comment to steam profiles",
-    "icons": {},
+    "description": "Improve steam friends experience",
+    "icons": {
+        "128": "./static/icon-128px.png"
+    },
     "content_scripts": [
         {
             "run_at": "document_end",
