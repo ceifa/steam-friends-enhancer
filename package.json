@@ -9,8 +9,7 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chrome": "0.0.117",
     "@types/firefox-webext-browser": "78.0.0",
