@@ -6,7 +6,8 @@ const startEverything = (features: FeatureBase[]) => {
     Promise.all(features.map(f => f.start()));
 }
 
-startEverything([
-    new CommentSender(),
-    new FriendSelector()
-]);
+window.addEventListener('load', async () =>
+    startEverything([
+        new CommentSender(),
+        new FriendSelector()
+    ]));

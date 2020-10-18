@@ -12,8 +12,6 @@ export class FriendSelector extends FeatureBase {
         const $sendCommentButton = document.createElement("span");
         $sendCommentButton.className = "manage_action btnv6_lightblue_blue btn_medium";
         $sendCommentButton.innerHTML = "<span>Select by offline days</span>";
-        $manageButtonsContainer.appendChild($sendCommentButton);
-
         $sendCommentButton.onclick = async ev => {
             const input = await sendPromptAction(undefined, 'Time in days', 'Select', undefined, '1');
             const days = parseInt(input);
@@ -34,5 +32,7 @@ export class FriendSelector extends FeatureBase {
                     });
                 });
         };
+
+        $manageButtonsContainer.appendChild($sendCommentButton);
     }
 }

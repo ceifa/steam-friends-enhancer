@@ -19,7 +19,7 @@ window.addEventListener("message", async (message: MessageEvent) => {
                 response.result = result;
             }
         } catch (e) {
-            response.error = e.message;
+            response.error = e?.message;
         }
 
         window.postMessage(response, "*");
