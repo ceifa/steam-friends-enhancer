@@ -4,7 +4,7 @@ The extension is available in some browser stores.
 
 **Google Chrome:** https://chrome.google.com/webstore/detail/steam-friends-enhancer/homplpaldlodpgkcilfgcbfoaolbmplm
 
-**Mozilla Firefox:** *Sometimes, but not now*
+**Mozilla Firefox:** https://addons.mozilla.org/en-US/firefox/addon/steam-friends-enhancer/
 
 ## How to Contribute
 
