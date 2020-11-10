@@ -10,7 +10,7 @@
         {
             "run_at": "document_end",
             "matches": [
-                "*://steamcommunity.com/id/*/friends/*"
+                "*://steamcommunity.com/*/*/friends*"
             ],
             "js": [
                 "./js/content.js"
@@ -27,6 +27,6 @@
         "/js/injected.js"
     ],
     "permissions": [
-        "*://steamcommunity.com/id/*/friends/*"
+        "*://steamcommunity.com/*/*/friends*"
     ]
 }
