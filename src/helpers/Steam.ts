@@ -18,6 +18,7 @@ declare global {
         ) => CModal;
         UpdateSelection: () => void;
         FE_currentModal: CModal;
+        FE_GuessNameFallback?: string;
     }
 }
 

@@ -4,6 +4,8 @@ import Logger from "../../helpers/Logger";
 import FeatureBase from "../FeatureBase";
 
 export class CommentSender extends FeatureBase {
+    private emoticons: string[];
+
     public start() {
         this.createCommentElement();
     }
@@ -46,6 +48,11 @@ export class CommentSender extends FeatureBase {
             const $comment = document.getElementById("post-comment-text") as HTMLInputElement;
             const comment = $comment.value;
 
+            if (!this.emoticons) {
+                const req = await fetch('https://steamcommunity.com/actions/EmoticonList');
+                this.emoticons = await req.json();
+            }
+
             if (comment && steamids.length > 0) {
                 await this.sendCommentsToFriends({
                     steamids,
@@ -73,7 +80,24 @@ export class CommentSender extends FeatureBase {
         for (const sid of steamids) {
             try {
                 const friendName = document.querySelector(`[data-steamid='${sid}'] .friend_block_content`).childNodes[0].textContent;
-                const commentToSend = comment.replace(/\{name\}/g, friendName);
+
+                const commentToSend = comment
+                    .replace(/\{name\}/g, friendName)
+                    .replace(/\{emoticon\}/g, () => {
+                        return this.emoticons[Math.floor(Math.random() * this.emoticons.length)];
+                    })
+                    .replace(/\{guessName\}/g, () => {
+                        const possibleName = friendName
+                            .replace(/[^A-Za-z0-9_-]/g, ' ')
+                            .split(' ')
+                            .sort((a, b) => b.length - a.length)[0];
+
+                        if (possibleName.length >= 2) {
+                            return `${possibleName[0].toUpperCase()}${possibleName.slice(1).toLowerCase()}`;
+                        } else {
+                            return window.FE_GuessNameFallback || friendName;
+                        }
+                    });
 
                 sent++;
 
