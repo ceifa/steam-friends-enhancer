@@ -148,9 +148,10 @@ export class CommentSender extends FeatureBase {
             })
         })
 
-        var response: { success: boolean } = await result.json();
+        var response: { success: boolean, error?: string } = await result.json();
         if (response?.success !== true) {
-            throw new Error('Comment request returned unsuccessful');
+            let message = response?.error ?? JSON.stringify(response);
+            throw new Error(`Comment request returned unsuccessful response: ${message}`);
         }
     }
 }
