@@ -8,6 +8,7 @@ declare global {
     interface Window {
         g_sessionID: string;
         ShowBlockingWaitDialog: (title: string, description: string) => CModal;
+        ShowDialog: (title: string, description: string) => CModal;
         ShowPromptDialog: (
             title: string,
             description: string,
@@ -37,8 +38,7 @@ export const sendPromptAction = (
     okBtn: string,
     cancelBtn: string,
     defaultValue: string
-) => {
-    return executeOnPageRealm<string>(() => {
+) => executeOnPageRealm<string>(() => {
         try {
             return window.ShowPromptDialog(
                 '{{title}}', '{{description}}', '{{okBtn}}', '{{cancelBtn}}', undefined, '{{defaultValue}}');
@@ -46,11 +46,18 @@ export const sendPromptAction = (
             return undefined;
         }
     }, { title, description, okBtn, cancelBtn, defaultValue });
-}
+
+export const sendDialog = (title: string, description: string) => executeOnPageRealm<void>(() => {
+    try {
+        return window.ShowDialog('{{title}}', '{{description}}');
+    } catch {
+        return undefined;
+    }
+}, { title, description });
 
 export const sendLoadingAction = async (title: string, description: string): Promise<{
     changeDescription: (newDescription: string) => void,
-    close: () => void
+    close: () => Promise<void>
 }> => {
     await executeOnPageRealm<void>(() => {
         window.FE_currentModal = window.ShowBlockingWaitDialog(
@@ -62,11 +69,9 @@ export const sendLoadingAction = async (title: string, description: string): Pro
         changeDescription: (newDescription: string) => {
             document.getElementById('fe-modal-description').innerText = newDescription;
         },
-        close: async () => {
-            await executeOnPageRealm<void>(() => {
-                window.FE_currentModal.Dismiss();
-                window.FE_currentModal = undefined;
-            });
-        }
+        close: () => executeOnPageRealm<void>(() => {
+            window.FE_currentModal.Dismiss();
+            window.FE_currentModal = undefined;
+        })
     };
 };

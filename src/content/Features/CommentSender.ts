@@ -1,5 +1,5 @@
 import { wait, objectToFormData } from "../../helpers/Util";
-import { getCurrentSessionId, sendLoadingAction } from "../../helpers/Steam";
+import { getCurrentSessionId, sendLoadingAction, sendDialog } from "../../helpers/Steam";
 import Logger from "../../helpers/Logger";
 import FeatureBase from "../FeatureBase";
 
@@ -26,6 +26,12 @@ export class CommentSender extends FeatureBase {
                     style="overflow: hidden; height: 50px;"
                 ></textarea>
             </div>
+            <div style="color: #AAAAAA; display: grid">
+                <span style="margin: 4px 0; color: #DDDDDD">Special variables:</span>
+                <span>{name} - Friend name</span>
+                <span>{emoticon} - Random emoticon that you own</span>
+                <span>{guessName} - Extract a better friend name (Remove site urls and special characters)</span>
+            </div>
             <div class="commentthread_entry_submitlink">
                 <span class="btn_green_white_innerfade btn_small">
                     <span id="post-comment-btn">Post Comment</span>
@@ -48,17 +54,25 @@ export class CommentSender extends FeatureBase {
             const $comment = document.getElementById("post-comment-text") as HTMLInputElement;
             const comment = $comment.value;
 
+            if (!comment) {
+                await sendDialog('Error', 'You must enter a comment');
+                return;
+            }
+
+            if (!steamids.length) {
+                await sendDialog('Error', 'You must select at least one friend');
+                return;
+            }
+
             if (!this.emoticons) {
                 const req = await fetch('https://steamcommunity.com/actions/EmoticonList');
                 this.emoticons = await req.json();
             }
 
-            if (comment && steamids.length > 0) {
-                await this.sendCommentsToFriends({
-                    steamids,
-                    comment
-                });
-            }
+            await this.sendCommentsToFriends({
+                steamids,
+                comment
+            });
         });
     }
 
@@ -102,12 +116,14 @@ export class CommentSender extends FeatureBase {
                 sent++;
 
                 Logger.log(`Sending to ${friendName}(${sid}) - ${sent}/${total}`);
-                await loading.changeDescription(`Total: ${sent}/${total} ~ Success: ${total - failed} ~ Failed: ${failed}`);
+                await loading.changeDescription(`Total: ${sent}/${total} ~ Success: ${sent - failed} ~ Failed: ${failed}`);
 
                 await this.sendComment(sid, commentToSend, sessionid);
-            } catch {
+            } catch (err) {
                 Logger.log("Failed to send to user " + sid);
                 failed++;
+
+                console.error(err)
             }
 
             await wait((5 + sent % 5 + Math.random() * 10) * 1000);

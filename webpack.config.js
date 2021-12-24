@@ -2,7 +2,7 @@ const path = require('path');
 
 const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const ExtensionReloader = require('webpack-extension-reloader');
+const ExtensionReloader = require('webpack-ext-reloader');
 
 const env = process.env.NODE_ENV || 'development';
 
