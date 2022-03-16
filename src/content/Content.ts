@@ -7,6 +7,6 @@ const startEverything = (features: FeatureBase[]) =>
 
 window.addEventListener('load', () =>
     startEverything([
+        new FriendSelector(),
         new CommentSender(),
-        new FriendSelector()
     ]));

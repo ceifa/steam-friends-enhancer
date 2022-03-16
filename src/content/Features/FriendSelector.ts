@@ -7,7 +7,7 @@ export class FriendSelector extends FeatureBase {
         this.addButton();
     }
 
-    private async addButton() {
+    private addButton() {
         const $manageButtonsContainer = document.querySelector('#manage_friends div:nth-child(2)') as HTMLElement;
         const $sendCommentButton = document.createElement("span");
         $sendCommentButton.className = "manage_action btnv6_lightblue_blue btn_medium";

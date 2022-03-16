@@ -17,7 +17,8 @@ export class CommentSender extends FeatureBase {
         $sendCommentButton.innerHTML = "<span>Send comment</span>";
         $manageButtonsContainer.appendChild($sendCommentButton);
 
-        const $postManageButtonsContainer = document.querySelector('#manage_friends div:nth-child(3)') as HTMLElement;
+        const $postManageButtonsContainer = document.createElement("div");
+        $manageButtonsContainer.appendChild($postManageButtonsContainer);
         $postManageButtonsContainer.setAttribute('style', 'display: none; padding-right: 16px; padding-bottom: 16px;');
         $postManageButtonsContainer.innerHTML = `
             <div class="commentthread_entry_quotebox">
